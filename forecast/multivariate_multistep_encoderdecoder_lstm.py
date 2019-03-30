@@ -1,4 +1,5 @@
 # multivariate multi-step encoder-decoder lstm
+import sys
 from math import sqrt
 from numpy import split
 from numpy import array
@@ -17,8 +18,8 @@ def split_dataset(data):
 	# split into standard weeks
 	train, test = data[1:-328], data[-328:-6]
 	# restructure into windows of weekly data
-	train = array(split(train, len(train)/7))
-	test = array(split(test, len(test)/7))
+	train = array(split(train, int(len(train)/7)))
+	test = array(split(test, int(len(test)/7)))
 	return train, test
 
 # evaluate one or more weekly forecasts against expected values
@@ -120,8 +121,10 @@ def evaluate_model(train, test, n_input):
 	score, scores = evaluate_forecasts(test[:, :, 0], predictions)
 	return score, scores
 
+
 # load the new file
-dataset = read_csv('household_power_consumption_days.csv', header=0, infer_datetime_format=True, parse_dates=['datetime'], index_col=['datetime'])
+# file should be household_power_consumption_days.csv
+dataset = read_csv(sys.argv[1], header=0, infer_datetime_format=True, parse_dates=['datetime'], index_col=['datetime'])
 # split into train and test
 train, test = split_dataset(dataset.values)
 # evaluate model and get scores
