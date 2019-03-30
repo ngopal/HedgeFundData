@@ -1,0 +1,10 @@
+## BTC System
+library(rgdax)
+
+btc_hist <- public_candles(product_id = "BTC-USD", 
+                           start = "2018-07-01", 
+                           end = "2019-03-29", 
+                           granularity = 86400)
+
+write.csv(btc_hist, file="BTC-USD.csv")
+
