@@ -1,0 +1,4 @@
+library(quantmod)
+
+getSymbols("QQQ")
+write.zoo(QQQ, file = "../../forecast/qqq.csv", quote = FALSE, sep=",")
