@@ -33,13 +33,16 @@ model.compile(loss='mse', optimizer='adam')
 print('compilation time : ', time.time() - start)
 
 #Step 3 Train the model
-model.fit(
+history = model.fit(
     X_train,
     y_train,
     batch_size=512,
     nb_epoch=100,
     validation_split=0.20)
 
+f = open('./reports/'+FILENAME+".txt", "w")
+f.write("LOSS: " + str(history.history['loss'][-1]) + "\n" + "VAL_LOSS: " + str(history.history['val_loss'][-1]))
+f.close()
 
 #Step 4 - Plot the predictions!
 predictions = lstm.predict_sequences_multiple(model, X_test, time_horizon, time_horizon)
