@@ -18,7 +18,7 @@ echo "<html>
 <body>
 " > ./reports/auto_report.html
 
-cp ./reports/auto_report.html ./reports/auto_report_MAE.html;
+# cp ./reports/auto_report.html ./reports/auto_report_MAE.html;
 
 myArray=( "$@" )
 
@@ -27,7 +27,7 @@ for arg in "${myArray[@]}"; do
    echo "$arg"
    Rscript ./data/generators/X.Rscript $arg
    cat ./data/files/"$arg".csv | cut -d"," -f2 | sed '1d' > ./data/files/$arg"_open.csv"
-   python forecast/simple_lstm/simple.py $arg
+   python forecast/simple_lstm/simple.py $arg 
    echo "
     <div class="row">
     <div class="column">
@@ -42,22 +42,22 @@ for arg in "${myArray[@]}"; do
     </div>
   </div>
    " >> ./reports/auto_report.html
-   python forecast/simple_lstm/simple_MAE.py $arg
-   echo "
-    <div class="row">
-    <div class="column">
-      <h2>$arg</h2>
-      <embed src="${arg}_MAE.txt">
-    </div>
-    <div class="column">
-      <img src="${arg}_performance_MAE.png" alt="Performance" style="width:100%">
-    </div>
-    <div class="column">
-      <img src="${arg}_prediction_MAE.png" alt="Prediction" style="width:100%">
-    </div>
-  </div>
-   " >> ./reports/auto_report_MAE.html
+  #  python forecast/simple_lstm/simple_MAE.py $arg
+  #  echo "
+  #   <div class="row">
+  #   <div class="column">
+  #     <h2>$arg</h2>
+  #     <embed src="${arg}_MAE.txt">
+  #   </div>
+  #   <div class="column">
+  #     <img src="${arg}_performance_MAE.png" alt="Performance" style="width:100%">
+  #   </div>
+  #   <div class="column">
+  #     <img src="${arg}_prediction_MAE.png" alt="Prediction" style="width:100%">
+  #   </div>
+  # </div>
+  #  " >> ./reports/auto_report_MAE.html
 done
 
 echo "</html>" >> ./reports/auto_report.html
-echo "</html>" >> ./reports/auto_report_MAE.html
+# echo "</html>" >> ./reports/auto_report_MAE.html
