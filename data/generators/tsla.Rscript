@@ -1,4 +1,4 @@
 library(quantmod)
 
 getSymbols("TSLA")
-write.zoo(TSLA, file = "../../forecast/tsla.csv", quote = FALSE, sep=",")
+write.zoo(TSLA, file = "../files/tsla.csv", quote = FALSE, sep=",")

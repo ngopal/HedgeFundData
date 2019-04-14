@@ -1,0 +1,5 @@
+library(quantmod)
+
+args = commandArgs(trailingOnly=TRUE)
+getSymbols(args)
+write.zoo(eval(parse(text = args)), file = paste("./files/",args,".csv",sep=""), quote = FALSE, sep=",")
