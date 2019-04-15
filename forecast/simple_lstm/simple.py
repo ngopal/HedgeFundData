@@ -44,9 +44,10 @@ reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=20, 
 
 # Obtain Previous Val Loss Metric
 model_files = os.listdir('./forecast/models/')
-previous_val_loss = None
+report_files = os.listdir('./reports/')
+previous_val_loss = 1000000
 previous_best_model = MODELNAME+'_best.hdf5'
-if previous_best_model in model_files:
+if previous_best_model in model_files and FILENAME+".txt" in report_files:
     print("Previous Model Exists")
     pm = open('./reports/'+FILENAME+".txt", "r")
     pm_lines = pm.readlines()
@@ -70,18 +71,6 @@ history = model.fit(
 predictions = lstm.predict_sequences_multiple(model, X_test, time_horizon, time_horizon)
 lstm.plot_results_multiple(predictions, y_test, time_horizon, MODELNAME+'_performance')
 
-# Compare previous model performance to new model performance
-if history.history["val_loss"][-1] < previous_val_loss:
-    print("New Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
-    model.save('./forecast/models/'+MODELNAME+'_auto.h5')
-else:
-    print("Previous Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
-    print("Making Prediction Using Previous Model")
-    model = load_model('./forecast/models/'+previous_best_model)
-
-# Save Model
-# model.save('./forecast/models/'+MODELNAME+'_auto.h5')
-
 # Make Prediction
 predictions_r = lstm.predict_sequences_multiple(model, X_test[-6:-1], time_horizon, time_horizon)
 lstm.plot_results_multiple(predictions_r, predictions_r, time_horizon, MODELNAME+'_prediction')
@@ -92,8 +81,16 @@ max_a = max(predictions_r[0])
 min_b = min(predictions_r[0])
 pct_change = (b - a) / a * 100
 max_pct_change = (max_a - min_b)/max_a * 100
+slope = (b - a) / TIMEHORIZON
 
-# These loss values are not for the previous model, but the new one...
-f = open('./reports/'+FILENAME+".txt", "w")
-f.write("LOSS: " + str(history.history['loss'][-1]) + "\n" + "VAL_LOSS: " + str(history.history['val_loss'][-1]) + "\n" + "PCT CHANGE: " + str(pct_change) + "\n" + "MAX PCT CHANGE: " + str(max_pct_change))
-f.close()
+# Compare previous model performance to new model performance
+if history.history["val_loss"][-1] < previous_val_loss:
+    print("New Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
+    model.save('./forecast/models/'+MODELNAME+'_auto.h5')
+    f = open('./reports/'+FILENAME+".txt", "w")
+    f.write("LOSS: " + str(history.history['loss'][-1]) + "\n" + "VAL_LOSS: " + str(history.history['val_loss'][-1]) + "\n" + "PCT CHANGE: " + str(pct_change) + "\n" + "MAX PCT CHANGE: " + str(max_pct_change) + "\n" + "SLOPE: " + str(slope))
+    f.close()
+else:
+    print("Previous Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
+    print("Making Prediction Using Previous Model")
+    model = load_model('./forecast/models/'+previous_best_model)
