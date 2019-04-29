@@ -26,6 +26,9 @@ def extract_relevant_fields(res):
 pprint.PrettyPrinter(indent=4)
 
 mem = []
+bull_count = 0
+bear_count = 0
+neutral_count = 0
 while True:
     vals = extract_relevant_fields(get_call("TSLA"))
     for v in vals:
@@ -33,9 +36,16 @@ while True:
             pass
         else:
             mem.append(v)
+            if v[1] == 'Bearish':
+                bear_count += 1
+            elif v[1] == 'Bullish':
+                bull_count += 1
+            else:
+                neutral_count += 1
     records = set(mem)
     pprint.pprint(records)
     print(len(records))
+    print(bear_count, neutral_count, bull_count, bull_count/bear_count)
     # if new records, then append new records to txt file
     time.sleep(30)
 
