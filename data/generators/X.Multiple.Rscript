@@ -5,11 +5,14 @@ tickers = args
 getSymbols(tickers)
 
 # Concatenate All
-timerange = "2000-01-01::2019-04-22"
+timerange = "2000-01-01::2019-04-29"
 ti <- c()
 for (t in tickers[!grepl("\\^", tickers)]) {
   ti <- c(ti, paste(t,"[\"", timerange,"\"]", sep=''))
+  print(ti)
 }
+
+print(as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))
 
 # Generate Matrix and Fill NAs with 0 Values
 write.zoo(na.fill(eval(parse(text=as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))),0), file = paste("./data/files/multiple_concatenated_tickers.csv",sep=""), quote = FALSE, sep=",")
