@@ -30,7 +30,7 @@ bull_count = 0
 bear_count = 0
 neutral_count = 0
 while True:
-    vals = extract_relevant_fields(get_call("TSLA"))
+    vals = extract_relevant_fields(get_call("GOOG"))
     for v in vals:
         if v in mem:
             pass

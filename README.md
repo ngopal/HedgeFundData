@@ -5,3 +5,6 @@ Currently using simple_qqq in forecast/simple_lstm/ directory.
 
 
 Link to pivot table: https://docs.google.com/spreadsheets/d/1oW4oicxFyK3RHUcoRUQFiqi3dN3kc-RW9mljbTrRLuk/edit#gid=7050670
+
+![Performance](reports/QQQ_Performance.png)
+![Prediction](reports/QQQ_Prediction.png)
