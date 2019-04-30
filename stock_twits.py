@@ -29,8 +29,9 @@ mem = []
 bull_count = 0
 bear_count = 0
 neutral_count = 0
+old_records = set(mem)
 while True:
-    vals = extract_relevant_fields(get_call("GOOG"))
+    vals = extract_relevant_fields(get_call(sys.argv[1]))
     for v in vals:
         if v in mem:
             pass
@@ -45,9 +46,18 @@ while True:
     records = set(mem)
     pprint.pprint(records)
     print(len(records))
-    print(bear_count, neutral_count, bull_count, bull_count/bear_count)
+    try:
+        print(bear_count, neutral_count, bull_count, bull_count/bear_count)
+    except:
+        pass
     # if new records, then append new records to txt file
+    f = open('./sentiment'+sys.argv[1]+'.txt', 'a')
+    for e in records.difference(old_records):
+        f.write(e[0]+'\t'+e[1]+'\t'+str(e[2])+'\t'+e[3]+'\n')
+    f.close()
+    print("NEW ENTRIES", records.difference(old_records))
     time.sleep(30)
+    old_records = records
 
 
 
