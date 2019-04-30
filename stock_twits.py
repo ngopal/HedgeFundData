@@ -31,7 +31,7 @@ bear_count = 0
 neutral_count = 0
 old_records = set(mem)
 while True:
-    vals = extract_relevant_fields(get_call(sys.argv[1]))
+    vals = extract_relevant_fields(get_call(sys.argv[1].decode('utf-8')))
     for v in vals:
         if v in mem:
             pass
