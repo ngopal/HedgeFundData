@@ -19,7 +19,7 @@ TIMEHORIZON = 5
 EPOCHS = 500
 LAYERS = 50
 VALIDATIONSIZE = 0.20
-window_time = 15
+window_time = 60
 
 time_horizon = TIMEHORIZON
 data = pd.read_csv('./data/files/multiple_concatenated_tickers.csv')

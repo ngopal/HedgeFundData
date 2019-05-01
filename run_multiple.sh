@@ -18,6 +18,8 @@ echo "<html>
 <body>
 " > ./reports/auto_report_MULTI.html
 
+cp ./reports/auto_report_MULTI.html ./reports/auto_report_MULTI_MAE.html
+
 myArray=( "$@" )
 
 # Generate Text Files
@@ -39,6 +41,22 @@ for arg in "${myArray[@]}"; do
     </div>
   </div>
    " >> ./reports/auto_report_MULTI.html
+   python forecast/simple_lstm/simple_all_MAE.py $arg 
+   echo "
+    <div class="row">
+    <div class="column">
+      <h2>$arg</h2>
+      <embed src="${arg}.txt">
+    </div>
+    <div class="column">
+      <img src="multiple_concatenated_tickers_${arg}_performance_MAE.png" alt="Performance" style="width:100%">
+    </div>
+    <div class="column">
+      <img src="multiple_concatenated_tickers_${arg}_prediction_MAE.png" alt="Prediction" style="width:100%">
+    </div>
+  </div>
+   " >> ./reports/auto_report_MULTI_MAE.html
 done
 
 echo "</html>" >> ./reports/auto_report_MULTI.html
+echo "</html>" >> ./reports/auto_report_MULTI_MAE.html
