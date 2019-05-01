@@ -13,17 +13,16 @@ if len(sys.argv[1]) == 0:
 else:
     INPUTTICKER = sys.argv[1]
 print(INPUTTICKER)
-FILENAME = 'multiple_concatenated_tickers'
+FILENAME = 'multiple_concatenated_tickers'+'_'+INPUTTICKER
 MODELNAME = FILENAME.split('.')[0]
 TIMEHORIZON = 5
 EPOCHS = 500
 LAYERS = 50
 VALIDATIONSIZE = 0.20
-normalise_window = False
+window_time = 15
 
 time_horizon = TIMEHORIZON
 data = pd.read_csv('./data/files/multiple_concatenated_tickers.csv')
-window_time = time_horizon
 data = (data.iloc[:,1:] - data.iloc[:,1:].rolling(window_time).min()) / (data.iloc[:,1:].rolling(window_time).max() - data.iloc[:,1:].rolling(window_time).min())
 data.fillna(value=-1, inplace=True)
 data_mat = data.iloc[:,1:].as_matrix()
@@ -103,22 +102,9 @@ history = model.fit(
     validation_split=VALIDATIONSIZE,
     callbacks=[mcp_save, reduce_lr_loss, earlyStopping])
 
-#Step 4 - Plot the predictions!
-predictions = lstm.predict_sequences_multiple(model, X_test, time_horizon, time_horizon)
-lstm.plot_results_multiple(predictions, y_test, time_horizon, MODELNAME+'_performance')
-
-# Make Prediction
-predictions_r = lstm.predict_sequences_multiple(model, X_test[-5:], time_horizon, time_horizon)
-lstm.plot_results_multiple(predictions_r, predictions_r, time_horizon, MODELNAME+'_prediction')
-print(predictions_r)
-a = predictions_r[0][0]
-b = predictions_r[0][-1]
-max_a = max(predictions_r[0])
-min_b = min(predictions_r[0])
-pct_change = (b - a) / a * 100
-max_pct_change = (max_a - min_b)/max_a * 100
-slope = (b - a) / TIMEHORIZON
-
+pct_change = 0
+max_pct_change = 0
+slope = 0
 # Compare previous model performance to new model performance (for reporting)
 if history.history["val_loss"][-1] < previous_val_loss:
     print("New Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
@@ -126,7 +112,40 @@ if history.history["val_loss"][-1] < previous_val_loss:
     f = open('./reports/'+FILENAME+".txt", "w")
     f.write("LOSS: " + str(history.history['loss'][-1]) + "\n" + "VAL_LOSS: " + str(history.history['val_loss'][-1]) + "\n" + "PCT CHANGE: " + str(pct_change) + "\n" + "MAX PCT CHANGE: " + str(max_pct_change) + "\n" + "SLOPE: " + str(slope))
     f.close()
+
+    #Step 4 - Plot the predictions!
+    predictions = lstm.predict_sequences_multiple(model, X_test, time_horizon, time_horizon)
+    lstm.plot_results_multiple(predictions, y_test, time_horizon, MODELNAME+'_performance')
+
+    # Make Prediction
+    predictions_r = lstm.predict_sequences_multiple(model, X_test[-5:], time_horizon, time_horizon)
+    lstm.plot_results_multiple(predictions_r, predictions_r, time_horizon, MODELNAME+'_prediction')
+    print(predictions_r)
+    a = predictions_r[0][0]
+    b = predictions_r[0][-1]
+    max_a = max(predictions_r[0])
+    min_b = min(predictions_r[0])
+    pct_change = (b - a) / a * 100
+    max_pct_change = (max_a - min_b)/max_a * 100
+    slope = (b - a) / TIMEHORIZON
+
 else:
     print("Previous Model Better", str(history.history["val_loss"][-1]), str(previous_val_loss))
     print("Making Prediction Using Previous Model")
     model = load_model('./forecast/models/'+previous_best_model)
+
+    #Step 4 - Plot the predictions!
+    predictions = lstm.predict_sequences_multiple(model, X_test, time_horizon, time_horizon)
+    lstm.plot_results_multiple(predictions, y_test, time_horizon, MODELNAME+'_performance')
+
+    # Make Prediction
+    predictions_r = lstm.predict_sequences_multiple(model, X_test[-5:], time_horizon, time_horizon)
+    lstm.plot_results_multiple(predictions_r, predictions_r, time_horizon, MODELNAME+'_prediction')
+    print(predictions_r)
+    a = predictions_r[0][0]
+    b = predictions_r[0][-1]
+    max_a = max(predictions_r[0])
+    min_b = min(predictions_r[0])
+    pct_change = (b - a) / a * 100
+    max_pct_change = (max_a - min_b)/max_a * 100
+    slope = (b - a) / TIMEHORIZON
