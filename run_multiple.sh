@@ -21,11 +21,11 @@ echo "<html>
 cp ./reports/auto_report_MULTI.html ./reports/auto_report_MULTI_MAE.html
 
 myArray=( "$@" )
+Rscript ./data/generators/X.Multiple.Rscript $@
 
 # Generate Text Files
 for arg in "${myArray[@]}"; do
    echo "$arg"
-#    Rscript ./data/generators/X.Rscript $arg # needs to be X.Multiple.R
    python forecast/simple_lstm/simple_all.py $arg 
    echo "
     <div class="row">

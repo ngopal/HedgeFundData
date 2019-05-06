@@ -16,10 +16,10 @@ print(INPUTTICKER)
 FILENAME = 'multiple_concatenated_tickers'+'_'+INPUTTICKER
 MODELNAME = FILENAME.split('.')[0]
 TIMEHORIZON = 5
-EPOCHS = 500
-LAYERS = 50
+EPOCHS = 250
+LAYERS = 250
 VALIDATIONSIZE = 0.20
-window_time = 60
+window_time = 30
 
 time_horizon = TIMEHORIZON
 data = pd.read_csv('./data/files/multiple_concatenated_tickers.csv')
