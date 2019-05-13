@@ -5,10 +5,10 @@ tickers = args
 getSymbols(tickers)
 
 # Concatenate All
-timerange = "2000-01-01::2019-05-01"
+timerange = "2000-01-01::2019-05-12"
 ti <- c()
-for (t in tickers[!grepl("\\^", tickers)]) {
-  ti <- c(ti, paste(t,"[\"", timerange,"\"]", sep=''))
+for (t in tickers) {
+  ti <- c(ti, paste(gsub("\\^", "", t),"[\"", timerange,"\"]", sep=''))
   print(ti)
 }
 
