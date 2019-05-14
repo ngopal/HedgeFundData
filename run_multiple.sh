@@ -60,3 +60,7 @@ done
 
 echo "</html>" >> ./reports/auto_report_MULTI.html
 echo "</html>" >> ./reports/auto_report_MULTI_MAE.html
+
+git add .
+git commit -m "auto"
+git push
