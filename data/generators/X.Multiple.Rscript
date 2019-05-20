@@ -5,14 +5,19 @@ tickers = args
 getSymbols(tickers)
 
 # Concatenate All
-timerange = "2000-01-01::2019-05-12"
+timerange = "2016-01-01::2019-05-19"
 ti <- c()
+volatility_df <- c()
 for (t in tickers) {
   ti <- c(ti, paste(gsub("\\^", "", t),"[\"", timerange,"\"]", sep=''))
+  volatility_df <- cbind(volatility_df, volatility(eval(parse(text=as.character(ti)))))
   print(ti)
 }
 
 print(as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))
 
+colnames(volatility_df) <- paste("volatility", tickers, sep="")
+
 # Generate Matrix and Fill NAs with 0 Values
 write.zoo(na.fill(eval(parse(text=as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))),0), file = paste("./data/files/multiple_concatenated_tickers.csv",sep=""), quote = FALSE, sep=",")
+write.zoo(na.fill(volatility_df,0), file = paste("./data/files/multiple_concatenated_tickers_volatility.csv",sep=""), quote = FALSE, sep=",")
