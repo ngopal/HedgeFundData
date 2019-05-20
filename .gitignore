@@ -1,4 +1,3 @@
 forecast/*.txt
 forecast/*.csv
-forecast/models/*
 data/files/*
