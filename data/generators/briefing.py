@@ -23,12 +23,16 @@ def getMarketUpdate(link):
     paragraphs = soup.findAll("div", {"class": "padding-top10 padding-bottom5"})
     market_snapshot = soup.find("table", {"class" : "smu-table"})
     data = []
-    rows = market_snapshot.find_all('tr')
-    for row in rows:
-        cols = row.find_all('td')
-        cols = [ele.text.strip() for ele in cols]
-        data.append([ele for ele in cols if ele]) # Get rid of empty values
-    return( (date_of_story.text, [i.text for i in paragraphs], data))
+    try:
+        rows = market_snapshot.find_all('tr')
+        for row in rows:
+            cols = row.find_all('td')
+            cols = [ele.text.strip() for ele in cols]
+            data.append([ele for ele in cols if ele]) # Get rid of empty values
+        return( (date_of_story.text, [i.text for i in paragraphs], data))
+    except:
+        print("FAILED")
+        return( (-1, [-1], []))
 
 # Tests
 # print(getMarketUpdate("https://www.briefing.com/investor/markets/stock-market-update/2012/1/20/stocks-squeek-out-slight-gain.htm"))
