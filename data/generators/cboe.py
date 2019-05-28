@@ -22,7 +22,7 @@ for y in range(2016,2020):
   for m in range(1,13):
     for d in range(1,31):
       print(d, m, y)
-      filename = str(d)+"_"+str(m)+"_"+str(y)+"_cboe_futures.dat"
+      filename = str(d)+"_"+str(m)+"_"+str(y)+"_cboe_futures.p"
       if filename in os.listdir("./cboe/"):
         print(filename, "exists, skipping")
       else:

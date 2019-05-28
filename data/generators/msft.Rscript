@@ -1,4 +1,0 @@
-library(quantmod)
-
-getSymbols("QQQ")
-write.zoo(QQQ, file = "../files/qqq.csv", quote = FALSE, sep=",")

@@ -1,4 +1,0 @@
-library(quantmod)
-
-getSymbols("TWTR")
-write.zoo(TWTR, file = "../files/twtr.csv", quote = FALSE, sep=",")

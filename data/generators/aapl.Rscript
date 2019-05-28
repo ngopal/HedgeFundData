@@ -1,4 +1,0 @@
-library(quantmod)
-
-getSymbols("AAPL")
-write.zoo(AAPL, file = "../files/aapl.csv", quote = FALSE, sep=",")
