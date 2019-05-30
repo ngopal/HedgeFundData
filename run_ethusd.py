@@ -68,46 +68,7 @@ print("TrainY", y_train)
 print("TestX", x_test)
 print("TestY", y_test)
 
-
-LAYERS = 120
-model = Sequential()
-
-model.add(LSTM(
-    input_dim=data.shape[1],
-    output_dim=LAYERS,
-    return_sequences=True))
-model.add(BatchNormalization())
-model.add(LSTM(
-    LAYERS,
-    return_sequences=False))
-model.add(Dropout(0.5))
-
-model.add(Dense(
-    output_dim=y_train.shape[1]))
-model.add(Activation('linear'))
-
-start = time.time()
-rmsprop = RMSprop(lr=0.1)
-model.compile(loss='mse', optimizer='adam')
-print('compilation time : ', time.time() - start)
-
 MODELNAME = 'simple_ethusd'
-earlyStopping = EarlyStopping(monitor='val_loss', patience=10, verbose=0, mode='min')
-mcp_save = ModelCheckpoint('./forecast/models/'+MODELNAME+'_best.hdf5', save_best_only=True, monitor='val_loss', mode='min')
-reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, verbose=1, epsilon=1e-4, mode='min')
-
-
-VALIDATIONSIZE = 0.25
-EPOCHS = 500
-model = keras.models.load_model('./forecast/models/'+MODELNAME+'_best.hdf5')
-history = model.fit(
-    x_train,
-    y_train,
-    batch_size=512,
-    nb_epoch=EPOCHS,
-    validation_split=VALIDATIONSIZE,
-    callbacks = [reduce_lr_loss, earlyStopping, mcp_save],
-    shuffle=True)
 
 best_model = keras.models.load_model('./forecast/models/'+MODELNAME+'_best.hdf5')
 days=10
