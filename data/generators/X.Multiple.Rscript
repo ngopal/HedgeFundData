@@ -39,7 +39,5 @@ colnames(volatility_df20) <- paste("volatility20", tickers, sep="")
 write.zoo(na.fill(eval(parse(text=as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))),0), file = paste("./data/files/multiple_concatenated_tickers.csv",sep=""), quote = FALSE, sep=",")
 write.zoo(na.fill(volatility_df,0), file = paste("./data/files/multiple_concatenated_tickers_volatility.csv",sep=""), quote = FALSE, sep=",")
 write.zoo(na.fill(volatility_df20,0), file = paste("./data/files/multiple_concatenated_tickers_volatility20.csv",sep=""), quote = FALSE, sep=",")
-#write.zoo(na.fill(volatility_df50,0), file = paste("./data/files/multiple_concatenated_tickers_volatility50.csv",sep=""), quote = FALSE, sep=",")
-#write.zoo(na.fill(volatility_df100,0), file = paste("./data/files/multiple_concatenated_tickers_volatility100.csv",sep=""), quote = FALSE, sep=",")
 
 
