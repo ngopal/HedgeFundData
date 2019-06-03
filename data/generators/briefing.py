@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-import time, random, pickle, os
+import time, random, pickle, os, datetime
 
 
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
@@ -57,10 +57,20 @@ def getAllDataForDay(date_of_incident):
         storydata.append(entry)
     return(storydata)
 
+now = datetime.datetime.now()
 for y in range(2016,2020):
     for m in range(1,13):
         for d in range(1,32):
             print(y, m, d)
+            if y > int(now.year):
+                print("year too far ahead")
+                continue
+            if y == int(now.year) and m > int(now.month):
+                print("year fine, month too far ahead")
+                continue
+            if y == int(now.year) and m == int(now.month) and d > int(now.day):
+                print("year fine, month fine, day too far ahead")
+                continue
             if str(y)+"_"+str(m)+"_"+str(d)+".p" not in os.listdir("./briefings/"):
                 date_url = "https://www.briefing.com/investor/markets/stock-market-update/"+str(y)+"/"+str(m)+"/"+str(d)+"/"
                 result = getAllDataForDay(date_url)

@@ -5,18 +5,26 @@ tickers = sub("\\.", "-", unique(args))
 getSymbols(tickers)
 
 # Concatenate All
-timerange = "2016-01-01::2019-05-25"
+timerange = "2016-01-01::2019-06-02"
 ti <- c()
 volatility_df <- c() #defaults to n=10
 volatility_df20 <- c()
 volatility_df50 <- c()
 volatility_df100 <- c()
 for (t in tickers) {
-  ti <- c(ti, paste("`", gsub("\\^", "", t), "`", "[\"", timerange,"\"]", sep=''))
-  volatility_df <- cbind(volatility_df, volatility(na.approx(eval(parse(text=as.character(ti))))))
-  volatility_df20 <- cbind(volatility_df20, volatility(na.approx(eval(parse(text=as.character(ti))), n=20)))
-  #volatility_df50 <- cbind(volatility_df50, volatility(eval(parse(text=as.character(ti))), n=50))
-  #volatility_df100 <- cbind(volatility_df100, volatility(eval(parse(text=as.character(ti))), n=100))
+  ticker_str = paste("`", gsub("\\^", "", t), "`", "[\"", timerange,"\"]", sep='')
+  ti <- c(ti, ticker_str)
+  if (dim(eval(parse(text=ticker_str))) > 10) {
+    volatility_df <- cbind(volatility_df, volatility(na.approx(eval(parse(text=as.character(ti))))))
+  } else {
+    print("Less than 10 values in data, no volatility calculation")
+  }
+
+  if (dim(eval(parse(text=ticker_str))) > 20) {
+    volatility_df20 <- cbind(volatility_df20, volatility(na.approx(eval(parse(text=as.character(ti))), n=20)))
+  } else {
+    print("Less than 20 values in data, no volatility20 calculation")
+  }
   print(ti)
 }
 
