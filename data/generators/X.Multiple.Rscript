@@ -8,20 +8,22 @@ getSymbols(tickers)
 timerange = "2016-01-01::2019-06-02"
 ti <- c()
 volatility_df <- c() #defaults to n=10
+volatility_tickers <- c()
 volatility_df20 <- c()
-volatility_df50 <- c()
-volatility_df100 <- c()
+volatility20_tickers <- c()
 for (t in tickers) {
   ticker_str = paste("`", gsub("\\^", "", t), "`", "[\"", timerange,"\"]", sep='')
   ti <- c(ti, ticker_str)
   if (dim(eval(parse(text=ticker_str))) > 10) {
     volatility_df <- cbind(volatility_df, volatility(na.approx(eval(parse(text=as.character(ti))))))
+    volatility_tickers <- cbind(volatility_tickers, t)
   } else {
     print("Less than 10 values in data, no volatility calculation")
   }
 
   if (dim(eval(parse(text=ticker_str))) > 20) {
     volatility_df20 <- cbind(volatility_df20, volatility(na.approx(eval(parse(text=as.character(ti))), n=20)))
+    volatility20_tickers <- cbind(volatility20_tickers, t)
   } else {
     print("Less than 20 values in data, no volatility20 calculation")
   }
@@ -30,10 +32,8 @@ for (t in tickers) {
 
 print(as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))
 
-colnames(volatility_df) <- paste("volatility", tickers, sep="")
-colnames(volatility_df20) <- paste("volatility20", tickers, sep="")
-#colnames(volatility_df50) <- paste("volatility50", tickers, sep="")
-#colnames(volatility_df100) <- paste("volatility100", tickers, sep="")
+colnames(volatility_df) <- paste("volatility", volatility_tickers, sep="")
+colnames(volatility_df20) <- paste("volatility20", volatility20_tickers, sep="")
 
 # Generate Matrix and Fill NAs with 0 Values
 write.zoo(na.fill(eval(parse(text=as.character(paste("cbind(", paste0(ti,sep='', collapse=', '), ")")))),0), file = paste("./data/files/multiple_concatenated_tickers.csv",sep=""), quote = FALSE, sep=",")
