@@ -5,7 +5,7 @@ tickers = sub("\\.", "-", unique(args))
 getSymbols(tickers)
 
 # Concatenate All
-timerange = "2016-01-01::2019-06-02"
+timerange = "2016-01-01::2019-06-08"
 ti <- c()
 volatility_df <- c() #defaults to n=10
 volatility_tickers <- c()
