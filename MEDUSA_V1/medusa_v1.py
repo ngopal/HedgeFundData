@@ -233,7 +233,6 @@ tbrd = TensorBoard(log_dir='./models/logs', histogram_freq=0, batch_size=32, wri
 # No need for this in production mode
 # testmodelcb = keras.callbacks.LambdaCallback(on_epoch_end=testmodel)
 
-
 reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
 reduce_lr_loss_training = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
 history = model.fit(
