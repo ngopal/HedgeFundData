@@ -4,16 +4,8 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import datetime
 
-# f = open("./cboe/4_1_2016_cboe_futures.dat", "rb")
-# d = pickle.loads(f.read())
-
-# table1_data = []
-# table2_data = []
-
 def GenerateTable1(date):
     filename = "./cboe/"+date+"_cboe_futures.p"
-    # if len([w for w in os.listdir("./cboe/") if w == date+"_cboe_futures.dat"]) == 0:
-    #     return -1
     f = open(filename, "rb")
     d = pickle.loads(f.read())
     table1_data = []
@@ -42,8 +34,6 @@ def GenerateTable1(date):
 
 def GenerateTable2(date):
     filename = "./cboe/"+date+"_cboe_futures.p"
-    # if len([w for w in os.listdir("./cboe/") if w == date+"_cboe_futures.dat"]) == 0:
-    #     return -1
     f = open(filename, "rb")
     d = pickle.loads(f.read())
     table2_data = []
@@ -72,28 +62,29 @@ def GenerateTable2(date):
                     pass
     return pd.DataFrame(table2_data)
 
-# print(GenerateTable1("26_11_2018"))
-# print(GenerateTable2("4_1_2016"))
+if __name__ == "__main__":
+    # print(GenerateTable1("26_11_2018"))
+    # print(GenerateTable2("4_1_2016"))
 
-dfs1 = []
-dfs2 = []
-for f in os.listdir("./cboe/"):
-    print(f)
-    print(f.split("_cboe")[0])
-    dfs1.append(GenerateTable1(f.split("_cboe")[0]))
-    dfs2.append(GenerateTable2(f.split("_cboe")[0]))
+    dfs1 = []
+    dfs2 = []
+    for f in os.listdir("./cboe/"):
+        print(f)
+        print(f.split("_cboe")[0])
+        dfs1.append(GenerateTable1(f.split("_cboe")[0]))
+        dfs2.append(GenerateTable2(f.split("_cboe")[0]))
 
-combined_df1 = pd.concat(dfs1)
-combined_df1 = combined_df1.set_index("date")
-print(combined_df1.shape)
-combined_df1.to_pickle("./data/files/cboedf1.p")
-print("Wrote df1 to file")
+    combined_df1 = pd.concat(dfs1)
+    combined_df1 = combined_df1.set_index("date")
+    print(combined_df1.shape)
+    combined_df1.to_pickle("./data/files/cboedf1.p")
+    print("Wrote df1 to file")
 
-combined_df2 = pd.concat(dfs2)
-combined_df2 = combined_df2.set_index("date")
-print(combined_df2.shape)
-combined_df2.to_pickle("./data/files/cboedf2.p")
-print("Wrote df1 to file")
-# loaded_df = pd.read_pickle("./data/files/cboedf.p")
-# print(loaded_df)
-# print(loaded_df.shape)
+    combined_df2 = pd.concat(dfs2)
+    combined_df2 = combined_df2.set_index("date")
+    print(combined_df2.shape)
+    combined_df2.to_pickle("./data/files/cboedf2.p")
+    print("Wrote df1 to file")
+    # loaded_df = pd.read_pickle("./data/files/cboedf.p")
+    # print(loaded_df)
+    # print(loaded_df.shape)
