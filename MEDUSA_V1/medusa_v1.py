@@ -6,6 +6,7 @@ from keras.activations import *
 from keras.callbacks import *
 from keras.optimizers import *
 from keras.models import *
+import matplotlib
 import matplotlib.pyplot as plt
 from keras.utils import to_categorical
 from sklearn.preprocessing import MinMaxScaler
@@ -14,6 +15,7 @@ from urllib.request import *
 from io import StringIO
 import pandas as pd
 import datetime
+import sys
 
 days = 5
 days_lookback = -1
@@ -22,6 +24,8 @@ VALIDATIONSIZE = 0.10
 EPOCHS = 5000
 current_date_str = str(datetime.datetime.now().isoformat().split('T')[0])
 MODELNAME = 'multiplemodeltest_medusa_itemized_'+current_date_str+'v1.0.1a'
+matplotlib.use('Agg')
+
 
 # Function to display the target and prediciton
 def testmodel(epoch, logs):
@@ -56,8 +60,8 @@ def url_for(series):
     print(series)
     return "https://fred.stlouisfed.org/graph/fredgraph.csv?bgcolor=%23e1e9f0&chart_type=line&drp=0&fo=open%20sans&graph_bgcolor=%23ffffff&height=450&mode=fred&recession_bars=on&txtcolor=%23444444&ts=12&tts=12&width=968&nt=0&thu=0&trc=0&show_legend=yes&show_axis_titles=yes&show_tooltip=yes&id="+series+"&scale=left&cosd=1947-01-01&coed=2019-01-01&line_color=%234572a7&link_values=false&line_style=solid&mark_type=none&mw=3&lw=2&ost=-99999&oet=99999&mma=0&fml=a&fq=Quarterly&fam=avg&fgst=lin&fgsnd=2009-06-01&line_index=1&transformation=lin&vintage_date=2019-05-07&revision_date=2019-05-07&nd=1947-01-01"
 
-data_orig = pd.read_csv('../data/files/multiple_concatenated_tickers.csv')
-vol_data_orig = pd.read_csv('../data/files/multiple_concatenated_tickers_volatility.csv')
+data_orig = pd.read_csv('./data/files/multiple_concatenated_tickers.csv')
+vol_data_orig = pd.read_csv('./data/files/multiple_concatenated_tickers_volatility.csv')
 
 data_orig = data_orig\
   .merge(vol_data_orig, how="inner", left_on=data_orig.Index, right_on=vol_data_orig.Index).fillna(method="ffill")\
@@ -173,9 +177,10 @@ data_orig2 = data_orig\
 ticker_lookup = dict([(i[1].split('.')[0], int(i[0])) for i in enumerate(list(data_orig.columns)) if (('Open' in i[1]) or ("volatility" in i[1]))])
 inv_map = {v+'.Open': k for k, v in dict(enumerate(list(ticker_lookup.keys()))).items()}
 
-pct_df = data_orig.shift(days_lookback).dropna()
+pct_df = data_orig.set_index("Index").shift(days_lookback).dropna()
 
 # De-trend data
+data_orig = data_orig.set_index("Index")
 data_orig_detrended = signal.detrend(data_orig)
 
 # Normalized data
@@ -209,14 +214,13 @@ model.add(LSTM(
     output_dim=LAYERS,
     kernel_regularizer=keras.regularizers.l2(0.01),
     return_sequences=True))
-# model.add(Dropout(0.2))
 model.add(BatchNormalization())
 model.add(LSTM(
     LAYERS,
     kernel_regularizer=keras.regularizers.l2(0.01),
     return_sequences=False))
 model.add(Dropout(0.5))
-
+model.add(BatchNormalization())
 model.add(Dense(
     output_dim=y_train.shape[1]))
 model.add(Activation('linear'))
@@ -235,24 +239,40 @@ tbrd = TensorBoard(log_dir='./models/logs', histogram_freq=0, batch_size=32, wri
 
 reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
 reduce_lr_loss_training = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
-history = model.fit(
-    x_train,
-    y_train,
-    batch_size=1024,
-    nb_epoch=EPOCHS,
-    validation_split=VALIDATIONSIZE,
-    callbacks = [reduce_lr_loss, mcp_save, tbrd, reduce_lr_loss_training],
-    shuffle=True)
 
-best_model = keras.models.load_model('./models/'+MODELNAME+'_best.hdf5') 
+args = sys.argv[1:]
+if args[0] == "--run-only":
+    best_model = keras.models.load_model('./models/'+MODELNAME+'_best.hdf5') 
 
-for t in list(ticker_lookup.keys()):
-    plt.style.use('fivethirtyeight')
-    plt.title(str(t)+" for week of "+current_date_str)
-    plt.plot([i[ticker_lookup[t]] for i in best_model.predict(np.reshape(data[-days:], (days, 1, data.shape[1])))])
-    plt.xticks(np.arange(5), ('M', 'T', 'W', 'Th', 'F'))
-    if "volatility" in t:
-        plt.savefig('../reports/'+t.split("volatility")[1]+'_volatility_prediction.png')
-    else:
-        plt.savefig('../reports/'+t+'_prediction.png')
-    plt.show()
+    for t in list(ticker_lookup.keys()):
+        plt.style.use('fivethirtyeight')
+        plt.title(str(t)+" for week of "+current_date_str)
+        plt.plot([i[ticker_lookup[t]] for i in best_model.predict(np.reshape(data[-days:], (days, 1, data.shape[1])))])
+        plt.xticks(np.arange(5), ('M', 'T', 'W', 'Th', 'F'))
+        if "volatility" in t:
+            plt.savefig('./reports/'+t.split("volatility")[1]+'_volatility_prediction.png')
+        else:
+            plt.savefig('./reports/'+t+'_prediction.png')
+        plt.show()
+else:
+    history = model.fit(
+        x_train,
+        y_train,
+        batch_size=1024,
+        nb_epoch=EPOCHS,
+        validation_split=VALIDATIONSIZE,
+        callbacks = [reduce_lr_loss, mcp_save, tbrd, reduce_lr_loss_training],
+        shuffle=True)
+
+    best_model = keras.models.load_model('./models/'+MODELNAME+'_best.hdf5') 
+
+    for t in list(ticker_lookup.keys()):
+        plt.style.use('fivethirtyeight')
+        plt.title(str(t)+" for week of "+current_date_str)
+        plt.plot([i[ticker_lookup[t]] for i in best_model.predict(np.reshape(data[-days:], (days, 1, data.shape[1])))])
+        plt.xticks(np.arange(5), ('M', 'T', 'W', 'Th', 'F'))
+        if "volatility" in t:
+            plt.savefig('./reports/'+t.split("volatility")[1]+'_volatility_prediction.png')
+        else:
+            plt.savefig('./reports/'+t+'_prediction.png')
+        plt.show()

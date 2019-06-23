@@ -1,9 +1,35 @@
-echo "Starting Script"
-Rscript ./data/generators/X.Multiple.Rscript $(cat tickers/tickers_all.txt)
-wait;
-echo "Generating Features and Building Model"
-python MEDUSA_V1/medusa_v1.python
-wait;
-git add .
-git commit -m "auto commit"
-git push
+#!/bin/bash
+for arg in "$@"
+do
+    if [ "$arg" == "--data" ] || [ "$arg" == "-d" ]
+    then
+        echo "Downloading Data"
+        Rscript ./data/generators/X.Multiple.Rscript $(cat tickers/tickers_all.txt)
+        wait;
+    fi
+    if [ "$arg" == "--model" ] || [ "$arg" == "-m" ]
+    then
+        echo "Generating Features and Building Model"
+        python MEDUSA_V1/medusa_v1.py
+        wait;
+    fi
+    if [ "$arg" == "--run-only" ] || [ "$arg" == "-r" ]
+    then
+        echo "Generating Features and Building Model"
+        python MEDUSA_V1/medusa_v1.py --run-only
+        wait;
+    fi
+    if [ "$arg" == "--push" ] || [ "$arg" == "-p" ]
+    then
+        git add reports/*
+        wait;
+        git add data/files/*
+        wait;
+        git commit -m "auto commit"
+        wait;
+        git push
+    fi
+    echo "DONE."
+done
+
+
