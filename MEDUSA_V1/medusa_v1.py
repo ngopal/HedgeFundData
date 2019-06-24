@@ -33,14 +33,14 @@ days = 5
 days_lookback = -1
 LAYERS = 30
 VALIDATIONSIZE = 0.10
-EPOCHS = 5000
+EPOCHS = 500
 RUN_ONLY = False
 seq_len = 90 # days to use for prediction
 current_date_str = str(datetime.datetime.now().isoformat().split('T')[0])
 MODELNAME = 'multiplemodeltest_medusa_itemized_'+current_date_str+'v1.0.1a'
 
-if '--run-only' in myargs.keys():
-    RUN_ONLY = myargs['--run-only']
+if '--inference-only' in myargs.keys():
+    RUN_ONLY = myargs['--inference-only']
 if '--batchsize' in myargs.keys():
     BATCHSIZE = myargs['--batchsize']
 if '--days-forward' in myargs.keys():

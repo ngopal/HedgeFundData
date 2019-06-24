@@ -13,10 +13,10 @@ do
         python MEDUSA_V1/medusa_v1.py
         wait;
     fi
-    if [ "$arg" == "--run-only" ] || [ "$arg" == "-r" ]
+    if [ "$arg" == "--inference-only" ] || [ "$arg" == "-i" ]
     then
         echo "Generating Features and Building Model"
-        python MEDUSA_V1/medusa_v1.py --run-only
+        python MEDUSA_V1/medusa_v1.py --inference-only 1
         wait;
     fi
     if [ "$arg" == "--push" ] || [ "$arg" == "-p" ]
