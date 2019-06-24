@@ -6,7 +6,6 @@ from keras.activations import *
 from keras.callbacks import *
 from keras.optimizers import *
 from keras.models import *
-import matplotlib
 import matplotlib.pyplot as plt
 from keras.utils import to_categorical
 from sklearn.preprocessing import MinMaxScaler
@@ -17,15 +16,47 @@ import pandas as pd
 import datetime
 import sys
 
+
+def getopts(argv):
+    opts = {}  # Empty dictionary to store key-value pairs.
+    while argv:  # While there are arguments left to parse...
+        if argv[0][0] == '-':  # Found a "-name value" pair.
+            opts[argv[0]] = argv[1]  # Add key and value to the dictionary.
+        argv = argv[1:]  # Reduce the argument list by copying it starting from index 1.
+    return opts
+
+args = sys.argv[1:]
+myargs = getopts(sys.argv)
+print(myargs)
+BATCHSIZE=1024
 days = 5
 days_lookback = -1
 LAYERS = 30
 VALIDATIONSIZE = 0.10
 EPOCHS = 5000
+RUN_ONLY = False
+seq_len = 90 # days to use for prediction
 current_date_str = str(datetime.datetime.now().isoformat().split('T')[0])
 MODELNAME = 'multiplemodeltest_medusa_itemized_'+current_date_str+'v1.0.1a'
-matplotlib.use('Agg')
 
+if '--run-only' in myargs.keys():
+    RUN_ONLY = myargs['--run-only']
+if '--batchsize' in myargs.keys():
+    BATCHSIZE = myargs['--batchsize']
+if '--days-forward' in myargs.keys():
+    days = myargs['--days-forward']
+if '--days-shift' in myargs.keys():
+    days_lookback = myargs['--days-shift']
+if '--prev-state-size' in myargs.keys():
+    seq_len = myargs['--prev-state-size']
+if '--epochs' in myargs.keys():
+    EPOCHS = myargs['--epochs']
+if '--layers' in myargs.keys():
+    LAYERS = myargs['--layers']
+if '--validation-size' in myargs.keys():
+    VALIDATIONSIZE = myargs['--validation-size']
+if '--model-name' in myargs.keys():
+    MODELNAME = myargs['--model-name']
 
 # Function to display the target and prediciton
 def testmodel(epoch, logs):
@@ -188,7 +219,6 @@ scaler = MinMaxScaler(feature_range=(0, 1))
 data_mat = scaler.fit_transform(data_orig_detrended[0:(data_orig_detrended.shape[0] - 1)])
 pctdf_mat = scaler.transform(pct_df)
 
-seq_len = 90 # days to use for prediction
 data = np.array((data_mat))
 
 sequence_length = seq_len + 1
@@ -240,8 +270,7 @@ tbrd = TensorBoard(log_dir='./models/logs', histogram_freq=0, batch_size=32, wri
 reduce_lr_loss = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
 reduce_lr_loss_training = ReduceLROnPlateau(monitor='loss', factor=0.5, patience=15, verbose=1, epsilon=1e-4, mode='min')
 
-args = sys.argv[1:]
-if args[0] == "--run-only":
+if RUN_ONLY:
     best_model = keras.models.load_model('./models/'+MODELNAME+'_best.hdf5') 
 
     for t in list(ticker_lookup.keys()):
@@ -253,12 +282,12 @@ if args[0] == "--run-only":
             plt.savefig('./reports/'+t.split("volatility")[1]+'_volatility_prediction.png')
         else:
             plt.savefig('./reports/'+t+'_prediction.png')
-        plt.show()
+        plt.clf()
 else:
     history = model.fit(
         x_train,
         y_train,
-        batch_size=1024,
+        batch_size=BATCHSIZE,
         nb_epoch=EPOCHS,
         validation_split=VALIDATIONSIZE,
         callbacks = [reduce_lr_loss, mcp_save, tbrd, reduce_lr_loss_training],
@@ -275,4 +304,4 @@ else:
             plt.savefig('./reports/'+t.split("volatility")[1]+'_volatility_prediction.png')
         else:
             plt.savefig('./reports/'+t+'_prediction.png')
-        plt.show()
+        plt.clf()
